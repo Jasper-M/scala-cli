@@ -187,7 +187,7 @@ jobs:
         SCALA_CLI_IT_GROUP: 3
         SCALA_CLI_SODIUM_JNI_ALLOW: false
 
-  generate-linux-arm64-native-launcher:
+  generate-linux-aarch64-native-launcher:
     runs-on: "macOS-m1"
     if: github.event_name == 'push'
     steps:
@@ -206,6 +206,30 @@ jobs:
           path: artifacts/
           if-no-files-found: error
           retention-days: 2
+
+  native-linux-aarch64-tests:
+    runs-on: "macOS-m1"
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+      - uses: VirtusLab/scala-cli-setup@7e6a0b2468fc28b94936417e4cad385e380ac735
+        with:
+          apps: ""
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux-aarch64-launchers
+          path: artifacts/
+      - name: Native integration tests
+        run: .github/scripts/test-linux-aarch64.sh
+        env:
+          UPDATE_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCALA_CLI_IT_FORCED_LAUNCHER_DIRECTORY: artifacts/
+          SCALA_CLI_IT_GROUP: 1
+          SCALA_CLI_SODIUM_JNI_ALLOW: false
+
 
   generate-macos-launcher:
     timeout-minutes: 120
@@ -872,6 +896,7 @@ jobs:
       - native-linux-tests-1
       - native-linux-tests-2
       - native-linux-tests-3
+      - native-linux-aarch64-tests
       - native-macos-tests-1
       - native-macos-tests-2
       - native-macos-tests-3
@@ -889,7 +914,7 @@ jobs:
       - format
       - checks
       - reference-doc
-      - generate-linux-arm64-native-launcher
+      - generate-linux-aarch64-native-launcher
     if: github.event_name == 'push'
     runs-on: ubuntu-20.04
     steps:
