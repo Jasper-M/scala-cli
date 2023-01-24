@@ -2,6 +2,7 @@
 set -euv
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+mkdir -p utils
 
 cp "$DIR/test-linux-aarch64-from-docker.sh" utils/
 
